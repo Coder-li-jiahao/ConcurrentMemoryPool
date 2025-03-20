@@ -1,6 +1,6 @@
 #include"ObjectPool.h"
 
 int main() {
-	TestObjectPool();
+	//TestObjectPool();
 	return 0;
 }

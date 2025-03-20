@@ -1,32 +1,7 @@
 #pragma once
 #include"Common.h"
 
-
-//直接去堆上申请按页申请空间
-inline static void* SystemAlloc(size_t kpage) {
-#ifdef _WIN32
-	void* ptr = VirtualAlloc(0, kpage << 13, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
-	//VirtualAlloc 是 Windows API 中的一个函数，用于在虚拟地址空间中分配内存。
-	//第一个参数 0 表示让系统自动选择分配内存的起始地址
-	//kpage << 13 是将 kpage 左移 13 位，相当于乘以 2^13 = 8192，因为通常一页的大小是 8KB
-	//MEM_COMMIT | MEM_RESERVE 表示既保留虚拟地址空间又提交物理内存
-	//PAGE_READWRITE 表示分配的内存区域具有读写权限
-#else
-	void* ptr = mmap(0, kpage << 13, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
-	//请求系统分配 kpage 页大小（每页 8KB）的匿名内存，
-	// 该内存区域既可以读也可以写，并且是私有的，不与任何文件关联。
-	// 如果映射成功，mmap 函数会返回映射区域的起始地址；
-	// 如果失败，会返回 MAP_FAILED
-	if (ptr == MAP_FAILED) {
-		ptr = nullptr;
-	}
-#endif
-	if (ptr == nullptr)
-		throw std::bad_alloc();
-
-	return ptr;
-}
-
+inline static void* SystemAlloc(size_t kpage);
 
 static void*& NextObj(void* ptr) {
 	return (*(void**)ptr);
